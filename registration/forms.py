@@ -5,7 +5,7 @@ from .models import Profile
 
 
 # =========================
-# USUARIO CON EMAIL + ESTILOS
+# USUARIO CON EMAIL + VALIDACIONES
 # =========================
 
 class UserCreationFormWithEmail(UserCreationForm):
@@ -73,12 +73,14 @@ class UserCreationFormWithEmail(UserCreationForm):
             'placeholder': 'Repetir contraseña'
         })
 
+    # 🔒 Email único
     def clean_email(self):
         email = self.cleaned_data.get("email")
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("El email ya está registrado.")
         return email
 
+    # 🔒 Código único (last_name)
     def clean_last_name(self):
         last_name = self.cleaned_data.get("last_name")
         if User.objects.filter(last_name=last_name).exists():
@@ -152,4 +154,3 @@ class UsernameForm(forms.ModelForm):
             if User.objects.filter(username=username).exists():
                 raise forms.ValidationError("Nombre de usuario ya está en uso")
         return username
-
