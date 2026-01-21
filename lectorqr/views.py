@@ -19,7 +19,7 @@ class AlumnoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     template_name = 'lectorqr/alumno_form.html'
     login_url = reverse_lazy('login')
 
-    # 🔐 Validación de permisos
+    # 🔐 Validación de permisos (SOLO STAFF / SUPERUSER)
     def test_func(self):
         return self.request.user.is_staff or self.request.user.is_superuser
 
@@ -33,24 +33,18 @@ class AlumnoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
 
 # ======================================================
-# PÁGINA DEL SCANNER (SOLO STAFF Y SUPERUSERS)
+# PÁGINA DEL SCANNER (TODOS LOS USUARIOS AUTENTICADOS)
 # ======================================================
-class ScannerPageView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class ScannerPageView(LoginRequiredMixin, TemplateView):
     template_name = "lectorqr/scanner.html"
-    login_url = reverse_lazy('admin:login')
-
-    # 🔐 Validación de permisos
-    def test_func(self):
-        return self.request.user.is_staff or self.request.user.is_superuser
+    login_url = reverse_lazy('login')
 
 
 # ======================================================
-# CONSULTA POR QR (SOLO STAFF Y SUPERUSERS)
+# CONSULTA POR QR (TODOS LOS USUARIOS AUTENTICADOS)
 # ======================================================
 def view_detalles_alumno(request):
-    if not request.user.is_authenticated or not (
-        request.user.is_staff or request.user.is_superuser
-    ):
+    if not request.user.is_authenticated:
         return JsonResponse({'error': 'Acceso no autorizado'}, status=403)
 
     if request.method == 'POST':
@@ -67,17 +61,11 @@ def view_detalles_alumno(request):
 
 
 # ======================================================
-# DETALLES DEL ALUMNO (SOLO STAFF Y SUPERUSERS)
+# DETALLES DEL ALUMNO (TODOS LOS USUARIOS AUTENTICADOS)
 # ======================================================
 def detalles_alumno(request):
-    if not request.user.is_authenticated or not (
-        request.user.is_staff or request.user.is_superuser
-    ):
-        return render(
-            request,
-            "error.html",
-            {"error_message": "No tienes permisos para acceder a esta sección"}
-        )
+    if not request.user.is_authenticated:
+        return redirect('login')
 
     id_alumno = request.GET.get('id')
 
@@ -105,4 +93,5 @@ def detalles_alumno(request):
         {"error": "No se proporcionó el parámetro 'id' en la URL."},
         status=400
     )
+
 
