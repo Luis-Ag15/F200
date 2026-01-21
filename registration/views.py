@@ -9,7 +9,6 @@ from .models import Profile
 from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponseForbidden
-from django.contrib.auth.models import User
 
 import os
 import uuid
@@ -35,7 +34,7 @@ class SignUpView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
 
-        # Código sugerido automático
+        # Código sugerido automático (solo visual)
         codigo = uuid.uuid4().hex[:8].upper()
 
         form.fields['username'].widget = forms.TextInput(attrs={
@@ -72,17 +71,8 @@ class SignUpView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
         return form
 
-    # 🔐 VALIDACIÓN: evitar códigos duplicados
     def form_valid(self, form):
-        codigo = form.cleaned_data.get('last_name')
-
-        if User.objects.filter(last_name=codigo).exists():
-            form.add_error(
-                'last_name',
-                'Este código ya está registrado. Por favor genera o usa otro.'
-            )
-            return self.form_invalid(form)
-
+        # Validaciones viven en el form
         form.save()
         return self.render_to_response(
             self.get_context_data(
