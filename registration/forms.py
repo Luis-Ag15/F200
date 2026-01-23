@@ -11,21 +11,24 @@ from .models import Profile
 class UserCreationFormWithEmail(UserCreationForm):
     email = forms.EmailField(
         required=True,
-        help_text="Requerido, 254 caracteres como máximo"
+        help_text="Requerido, 254 caracteres como máximo",
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
     )
 
     first_name = forms.CharField(
         required=True,
         max_length=150,
         label="Nombre",
-        help_text="Requerido, 150 caracteres como máximo"
+        help_text="Requerido, 150 caracteres como máximo",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 
     last_name = forms.CharField(
         required=True,
         max_length=10,
         label="Código",
-        help_text="Requerido, 10 caracteres como máximo"
+        help_text="Requerido, 10 caracteres como máximo",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'id': 'codigo'})
     )
 
     class Meta:
@@ -46,28 +49,19 @@ class UserCreationFormWithEmail(UserCreationForm):
             'class': 'form-control mb-2',
             'placeholder': 'Nombre de usuario'
         })
-
         self.fields['first_name'].widget.attrs.update({
-            'class': 'form-control mb-2',
             'placeholder': 'Nombre'
         })
-
         self.fields['last_name'].widget.attrs.update({
-            'class': 'form-control mb-2',
-            'placeholder': 'Código',
-            'id': 'codigo'
+            'placeholder': 'Código'
         })
-
         self.fields['email'].widget.attrs.update({
-            'class': 'form-control mb-2',
             'placeholder': 'Dirección email'
         })
-
         self.fields['password1'].widget.attrs.update({
             'class': 'form-control mb-2',
             'placeholder': 'Contraseña'
         })
-
         self.fields['password2'].widget.attrs.update({
             'class': 'form-control mb-2',
             'placeholder': 'Repetir contraseña'
@@ -119,7 +113,8 @@ class ProfileForm(forms.ModelForm):
 class EmailForm(forms.ModelForm):
     email = forms.EmailField(
         required=True,
-        help_text="Requerido, 254 caracteres máximo"
+        help_text="Requerido, 254 caracteres máximo",
+        widget=forms.EmailInput(attrs={'class': 'form-control'})
     )
 
     class Meta:
@@ -141,7 +136,8 @@ class EmailForm(forms.ModelForm):
 class UsernameForm(forms.ModelForm):
     username = forms.CharField(
         max_length=150,
-        help_text="Requerido, 150 caracteres máximo"
+        help_text="Requerido, 150 caracteres máximo",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
     )
 
     class Meta:
