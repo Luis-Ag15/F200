@@ -1,4 +1,10 @@
-from .forms import UserCreationFormWithEmail, ProfileForm, EmailForm, UsernameForm
+from .forms import (
+    UserCreationFormWithEmail,
+    ProfileForm,
+    EmailForm,
+    UsernameForm
+)
+
 from django.views.generic import CreateView, UpdateView
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -22,6 +28,7 @@ import qrcode
 class SignUpView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     form_class = UserCreationFormWithEmail
     template_name = 'registration/signup.html'
+    success_url = reverse_lazy('home')
 
     def test_func(self):
         return self.request.user.is_staff or self.request.user.is_superuser
@@ -34,52 +41,41 @@ class SignUpView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
 
-        # Código sugerido automático (solo visual)
         codigo = uuid.uuid4().hex[:8].upper()
 
-        form.fields['username'].widget = forms.TextInput(attrs={
+        form.fields['username'].widget.attrs.update({
             'class': 'form-control mb-2',
             'placeholder': 'Nombre de usuario'
         })
 
-        form.fields['first_name'].widget = forms.TextInput(attrs={
+        form.fields['first_name'].widget.attrs.update({
             'class': 'form-control mb-2',
             'placeholder': 'Nombre'
         })
 
-        form.fields['last_name'].widget = forms.TextInput(attrs={
+        form.fields['last_name'].widget.attrs.update({
             'class': 'form-control mb-2',
             'placeholder': 'Código',
             'id': 'codigo',
             'value': codigo
         })
 
-        form.fields['email'].widget = forms.EmailInput(attrs={
+        form.fields['email'].widget.attrs.update({
             'class': 'form-control mb-2',
             'placeholder': 'Dirección email'
         })
 
-        form.fields['password1'].widget = forms.PasswordInput(attrs={
+        form.fields['password1'].widget.attrs.update({
             'class': 'form-control mb-2',
             'placeholder': 'Contraseña'
         })
 
-        form.fields['password2'].widget = forms.PasswordInput(attrs={
+        form.fields['password2'].widget.attrs.update({
             'class': 'form-control mb-2',
             'placeholder': 'Repetir contraseña'
         })
 
         return form
-
-    def form_valid(self, form):
-        # Validaciones viven en el form
-        form.save()
-        return self.render_to_response(
-            self.get_context_data(
-                form=self.form_class(),
-                success=True
-            )
-        )
 
 
 # =========================
@@ -94,7 +90,9 @@ class ProfileUpdate(UpdateView):
     success_url = reverse_lazy('profile')
 
     def get_object(self):
-        profile, created = Profile.objects.get_or_create(user=self.request.user)
+        profile, created = Profile.objects.get_or_create(
+            user=self.request.user
+        )
         return profile
 
 
@@ -136,7 +134,11 @@ def profile_qr(request):
 
     ruta_imagen = f"{settings.MEDIA_URL}qrs/{nombreQR}"
 
-    return render(request, 'registration/profile_qr.html', {
-        'ruta_imagen': ruta_imagen,
-        'texto': texto,
-    })
+    return render(
+        request,
+        'registration/profile_qr.html',
+        {
+            'ruta_imagen': ruta_imagen,
+            'texto': texto,
+        }
+    )
